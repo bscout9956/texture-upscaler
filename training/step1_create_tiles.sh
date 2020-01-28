@@ -174,7 +174,7 @@ while read FILENAME; do
     echo ${FILENAME}, already processed, skipped
   fi
   
-done < <(find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \))
+done < <(find "${INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.png"  \))
 
 wait_for_jobs
 wait
