@@ -115,6 +115,10 @@ wait_for_jobs() {
   fi
 }
 
+if [ "$ENABLE_RANDOM_FILTERSCALE" == 1 ]; then
+  echo "Random scaling is on"
+fi
+
 while read FILENAME; do
 
   DIRNAME=$(dirname "${FILENAME}")
