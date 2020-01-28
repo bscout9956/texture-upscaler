@@ -165,13 +165,13 @@ while read FILENAME; do
 
         RANDOM_NUMBER_HR=$(( $RANDOM % 2 ))
         if [ "$RANDOM_NUMBER_HR" == 0 ]; then
-          LR_FILTER=point
-          LR_INTERPOLATE=Nearest
+          HR_FILTER=point
+          HR_INTERPOLATE=Nearest
         else
-          LR_FILTER=Catrom
-          LR_INTERPOLATE=Catrom
+          HR_FILTER=Catrom
+          HR_INTERPOLATE=Catrom
         fi
-      fi      
+      fi
 
       if [ "$(convert "${FILENAME}" -alpha off -format "%[k]" info:)" -gt "1" ]; then
         mkdir -p "${HR_OUTPUT_DIR}/${CATEGORY}/rgb"
