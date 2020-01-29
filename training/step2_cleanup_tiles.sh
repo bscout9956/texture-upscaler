@@ -124,7 +124,7 @@ cleanup_task() {
 while read FILENAME; do
  wait_for_jobs
  cleanup_task ${FILENAME} &
-done < <(find "${HR_OUTPUT_DIR}" \( -iname "*.dds" -or -iname "*.png" \))
+done < <(find "${HR_OUTPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \))
 
 wait_for_jobs
 wait
