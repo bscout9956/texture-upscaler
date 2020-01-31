@@ -112,6 +112,6 @@ while read FILENAME; do
   fi
 
   ((INDEX++))
-done < <(find "${HR_INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png" \) | shuf -n ${MAX_TILE_COUNT})
+done < <(find "${HR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \) | shuf -n ${MAX_TILE_COUNT})
 
 echo "finished"
