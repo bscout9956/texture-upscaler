@@ -132,12 +132,14 @@ while read FILENAME; do
       convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
       convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
     elif [ "${DISABLE_OVERWRITE}" == "1" ]; then
-      echo "${DISABLE_OVERWRITE}"
-      if [ "${DISABLE_LOGGING}" == "0" ]; then
-        echo "${BASENAME} may already exist, skipping"
+	  if [[ ! -f "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}" || ! -f "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
+		convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
+        convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
+	  elif [ "${DISABLE_LOGGING}" == "0" ]; then	    
+        echo "${BASENAME} may already exist, skipping"		
       fi
-      continue
-    fi   
+	fi
+    continue 
   fi
 
   ((INDEX_TRAIN++))
@@ -157,16 +159,20 @@ while read FILENAME; do
       echo validation LR and HR: "${BASENAME_NO_EXT}"
     fi
 
-    # Check whether the LR and HR already exist. Skip if overwite is disabled
+    # Check whether the LR and HR already exist. Skip if overwrite is disabled
+	# TODO: Prettify this, it's borderline unreadable
     if [[ ( ! -f "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}" || ! -f "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}" ) && "${DISABLE_OVERWRITE}" == "0" ]]; then
       convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
       convert "${VAL_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
     elif [ "$DISABLE_OVERWRITE" == "1" ]; then
-      if [ "${DISABLE_LOGGING}" == "0" ]; then
-        echo "${BASENAME} may already exist, skipping"
+	  if [[ ! -f "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}" || ! -f "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
+		convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
+        convert "${VAL_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
+	  elif [ "${DISABLE_LOGGING}" == "0" ]; then	    
+        echo "${BASENAME} may already exist, skipping"		
       fi
-      continue
-    fi
+	fi
+    continue 
   fi
 
   ((INDEX_VAL++))
