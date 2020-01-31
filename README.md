@@ -39,7 +39,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 
 ### Scripts to prepare for training  ###
-`training/step1_create_tiles.sh`: Create equal size tiles (1 for HR/GT, 1 downscaled for LR), separating the RGB and alpha, use separate directories according to regexp
+`training/step1_create_tiles.sh`: Create equal size tiles (1 for HR/GT, 1 downscaled for LR), separating the RGB and alpha, use separate directories according to regexp, with optional random scaling filters
 
 `training/step2_cleanup_tiles.sh`: Cleanup tiles, remove tiles that have too little colors and/or that do not fit the required size for HR/GT and LR
 
