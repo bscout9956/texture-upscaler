@@ -26,7 +26,7 @@ Table of Contents
 
 The included scripts are for preparing your images to be used by ESRGAN, SFTGAN etc. and ressassemble them (no seams)
 
-**Note:** Will only work on power of 2 sized textures at the moment
+**Note:** Will work best on power of 2 sized textures/images at the moment. Refer to the instructions on training ESRGAN/step4_crop_center.sh for more information on non-square textures/images
 
 **Note:** When `.` is mentioned before a path, it means relative to the `ctp-texture-upscale` directory
 
@@ -37,12 +37,15 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 `step3_assemble_tiles.sh`: Reassemble tiles and use the overlap for blending (to remove seams), recombine the RGB and alpha, with optional rescaling
 
+
 ### Scripts to prepare for training  ###
 `training/step1_create_tiles.sh`: Create equal size tiles (1 for HR/GT, 1 downscaled for LR), separating the RGB and alpha, use separate directories according to regexp
 
 `training/step2_cleanup_tiles.sh`: Cleanup tiles, remove tiles that have too little colors and/or that do not fit the required size for HR/GT and LR
 
 `training/step3_select_tiles.sh`: Select tiles according to a specified percentage to be used for training and validation
+
+`training/step4_crop_center.sh`: A workaround/sanity check to correct any tiles that aren't perfectly square.
 
 ## Installing ESRGAN and/or SFTGAN
 
@@ -113,9 +116,13 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - Go to the `./training` directory
  - `./step1_create_tiles.sh`
  - Results will be inside `./training/output`
+ - If you have non-square images, Step 2 may end up killing all of your tiles. Skip it if this is the case.
  - `./step2_cleanup_tiles.sh`
+ - Verify the parameters inside the file for better customization and results
  - `./step3_select_tiles.sh`
- - End result will be inside `./training/output_training` and `./training/output_validation`
+ - (OPTIONAL) If you have non-square images (or want sanity check?), execute `./step4_crop_center.sh`. This will crop your images to make sure they are exactly square. Refer to the file for exact dimensions.
+ - The end result will depend on whether you ran step4 or not.
+ - End result will be inside `./training/output_training` and `./training/output_validation` if you only went until step3 or `./datasets/train` and `datasets/val` if you ran step4.
  - Go to `<basicsr path>/codes` and modify the `options/train/train_ESRGAN.json` file as follows:
    - Change the `name` to something else that has no `debug` in it.
    - In `train` you may want to decrease the `n_workers` and `batch_size` values to for ex.: 4 and 8
@@ -134,6 +141,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 - You may have to increase some of the values in Image Magick's `policy.xml` file to allow for more memory to be used.
 - If Image Magick keeps complaining about memory limits you can comment out the `resource` lines in `policy.xml`
+- You may face errors in tensorflow if your images are not square and you are training. Refer to Script 4 and the instructions on the Usage for training ESRGAN and/or SFTGAN section.
 
 ## Requirements
  - Bash (if you do not have Linux you can try the Git for Window's Bash instead)
@@ -147,6 +155,6 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - PyTorch
  
 ### Required if you want to train ESRGAN
- - Python modules: numpy opencv-python torchvision tensorboardX lmdb
+ - Python modules: numpy opencv-python torchvision tensorflow tensorboardX lmdb
  - BasicSR: https://github.com/xinntao/BasicSR/
 
