@@ -11,11 +11,11 @@ TRAIN_LR_INPUT_DIR="./output_training/LR"
 VAL_HR_INPUT_DIR="./output_validation/HR"
 TRAIN_HR_INPUT_DIR="./output_training/HR"
 
-TRAINING_HR_OUTPUT_DIR="datasets/train/HR"
-VALIDATION_HR_OUTPUT_DIR="datasets/val/HR"
+TRAINING_HR_OUTPUT_DIR="datasets/train/rgb/HR"
+VALIDATION_HR_OUTPUT_DIR="datasets/val/rgb/HR"
 
-TRAINING_LR_OUTPUT_DIR="datasets/train/LR"
-VALIDATION_LR_OUTPUT_DIR="datasets/val/LR"
+TRAINING_LR_OUTPUT_DIR="datasets/train/rgb/LR"
+VALIDATION_LR_OUTPUT_DIR="datasets/val/rgb/LR"
 
 # Desired sizes for the LR and HR tiles
 LR_SIZE="32x32"
@@ -127,7 +127,6 @@ echo "Processsing the training dataset..."
 
 INDEX_TRAIN=0
 while read FILENAME; do
-
   DIRNAME=$(dirname "${FILENAME}")
   BASENAME=$(basename "${FILENAME}")
   BASENAME_NO_EXT="${BASENAME%.*}"
@@ -198,7 +197,6 @@ while read FILENAME; do
       fi
     fi
   fi
-
   ((INDEX_VAL++))
 done < <(find "${VAL_HR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \))
 
