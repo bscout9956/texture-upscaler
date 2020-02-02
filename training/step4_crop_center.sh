@@ -65,10 +65,6 @@ for OPTION in "$@"; do
     VALIDATION_LR_OUTPUT_DIR="${OPTION#*=}"
     shift
     ;;
-    -c=*|--max-tile-count=*)
-    MAX_TILE_COUNT="${OPTION#*=}"
-    shift
-    ;;
     -ls=*|--lr-tile-size=*)
     LR_SIZE="${OPTION#*=}"
     shift
@@ -96,10 +92,9 @@ for OPTION in "$@"; do
       echo "--validation-hr-output-dir \"<validation hr output dir>\" (default: ${VALIDATION_HR_OUTPUT_DIR})"
       echo "--training-lr-output-dir \"<training lr output dir>\" (default: ${TRAINING_LR_OUTPUT_DIR})"
       echo "--validation-lr-output-dir \"<validation lr output dir>\" (default: ${VALIDATION_LR_OUTPUT_DIR})"
-      echo "-c, --max-tile-count \"<number>\" (default: ${MAX_TILE_COUNT})"
       echo "-ls, --lr-tile-size \"<dimensions>\" (default: ${LR_SIZE})"
       echo "-hs, --hr-tile-size \"<dimensions>\" (default: ${HR_SIZE})"
-      echo "-dl, --disable-logging"
+      echo "-dl, --disable-logging (default: ${DISABLE_LOGGING})"
       echo "-do, --disable-overwrite"
       exit 1
     ;;
