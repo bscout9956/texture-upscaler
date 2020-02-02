@@ -11,11 +11,11 @@ TRAIN_LR_INPUT_DIR="./output_training/LR"
 VAL_HR_INPUT_DIR="./output_validation/HR"
 TRAIN_HR_INPUT_DIR="./output_training/HR"
 
-TRAINING_HR_OUTPUT_DIR="datasets/train/rgb/HR"
-VALIDATION_HR_OUTPUT_DIR="datasets/val/rgb/HR"
+TRAINING_HR_OUTPUT_DIR="datasets/train/HR"
+VALIDATION_HR_OUTPUT_DIR="datasets/val/HR"
 
-TRAINING_LR_OUTPUT_DIR="datasets/train/rgb/LR"
-VALIDATION_LR_OUTPUT_DIR="datasets/val/rgb/LR"
+TRAINING_LR_OUTPUT_DIR="datasets/train/LR"
+VALIDATION_LR_OUTPUT_DIR="datasets/val/LR"
 
 # Desired sizes for the LR and HR tiles
 LR_SIZE="32x32"
