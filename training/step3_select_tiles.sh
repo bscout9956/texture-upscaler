@@ -34,11 +34,11 @@ for OPTION in "$@"; do
     HR_INPUT_DIR="${OPTION#*=}"
     shift
     ;;
-    -t=*|--training-percentage=*)
+    -tp=*|--training-percentage=*)
     TRAINING_PERCENTAGE="${OPTION#*=}"
     shift
     ;;
-    -v=*|--validation-percentage=*)
+    -vp=*|--validation-percentage=*)
     VALIDATION_PERCENTAGE="${OPTION#*=}"
     shift
     ;;
@@ -58,7 +58,7 @@ for OPTION in "$@"; do
     VALIDATION_LR_OUTPUT_DIR="${OPTION#*=}"
     shift
     ;;
-    -c=*|--max-tile-count=*)
+    -mtc=*|--max-tile-count=*)
     MAX_TILE_COUNT="${OPTION#*=}"
     shift
     ;;
@@ -67,13 +67,13 @@ for OPTION in "$@"; do
       echo "-t, --threads \"<number>\" (default: ${THREADS})"
       echo "-l, --lr-input-dir \"<lr input dir>\" (default: ${LR_INPUT_DIR})"
       echo "-h, --hr-input-dir \"<hr input dir>\" (default: ${HR_INPUT_DIR})"
-      echo "-t, --training-percentage \"<lr input dir>\" (default: ${TRAINING_PERCENTAGE})"
-      echo "-v, --validation-percentage \"<hr input dir>\" (default: ${VALIDATION_PERCENTAGE})"
+      echo "-tp, --training-percentage (default: ${TRAINING_PERCENTAGE})"
+      echo "-vp, --validation-percentage (default: ${VALIDATION_PERCENTAGE})"
       echo "--training-hr-output-dir \"<training hr output dir>\" (default: ${TRAINING_HR_OUTPUT_DIR})"
       echo "--validation-hr-output-dir \"<validation hr output dir>\" (default: ${VALIDATION_HR_OUTPUT_DIR})"
       echo "--training-lr-output-dir \"<training lr output dir>\" (default: ${TRAINING_LR_OUTPUT_DIR})"
       echo "--validation-lr-output-dir \"<validation lr output dir>\" (default: ${VALIDATION_LR_OUTPUT_DIR})"
-      echo "-c, --max-tile-count \"<number>\" (default: ${MAX_TILE_COUNT})"
+      echo "-mtc, --max-tile-count \"<number>\" (default: ${MAX_TILE_COUNT})"
       exit 1
     ;;
   esac

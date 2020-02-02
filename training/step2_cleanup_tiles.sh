@@ -25,7 +25,7 @@ for OPTION in "$@"; do
     THREADS="${OPTION#*=}"
     shift
     ;;
-    -c=*|--min-colors=*)
+    -mc=*|--min-colors=*)
     MIN_COLORS="${OPTION#*=}"
     shift
     ;;
@@ -37,12 +37,12 @@ for OPTION in "$@"; do
     HR_OUTPUT_DIR="${OPTION#*=}"
     shift
     ;;
-    -w=*|--tile-width=*)
+    -tw=*|--tile-width=*)
     HR_MIN_TILE_WIDTH="${OPTION#*=}"
     HR_MAX_TILE_WIDTH="${OPTION#*=}"
     shift
     ;;
-    -h=*|--tile-height=*)
+    -th=*|--tile-height=*)
     HR_MIN_TILE_HEIGHT="${OPTION#*=}"
     HR_MAX_TILE_HEIGHT="${OPTION#*=}"
     shift
@@ -50,11 +50,11 @@ for OPTION in "$@"; do
     *)
       echo "usage: $@ ..."
       echo "-t, --threads \"<number>\" (default: ${THREADS})"
-      echo "-c, --min-colors \"<number>\" (default: ${MIN_COLORS})"
+      echo "-mc, --min-colors \"<number>\" (default: ${MIN_COLORS})"
       echo "-l, --lr-output-dir \"<lr output dir>\" (default: ${LR_OUTPUT_DIR})"
       echo "-h, --hr-output-dir \"<hr output dir>\" (default: ${HR_OUTPUT_DIR})"
-      echo "-w, --tile-width \"<pixels>\" (default: ${HR_MIN_TILE_WIDTH})"
-      echo "-h, --tile-height \"<pixels>\" (default: ${HR_MIN_TILE_HEIGHT})"
+      echo "-tw, --tile-width \"<pixels>\" (default: ${HR_MIN_TILE_WIDTH})"
+      echo "-th, --tile-height \"<pixels>\" (default: ${HR_MIN_TILE_HEIGHT})"
       exit 1
     ;;
   esac

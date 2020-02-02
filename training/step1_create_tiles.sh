@@ -81,8 +81,8 @@ for OPTION in "$@"; do
     MAX_TILE_HEIGHT="${OPTION#*=}"
     shift
     ;;
-    -r=*|--random-filtering=*)
-    ENABLE_RANDOM_FILTERSCALE="${OPTION#*=}"
+    -r|--random-filtering)
+    ENABLE_RANDOM_FILTERSCALE="1"
     shift
     ;;
     *)
@@ -99,7 +99,7 @@ for OPTION in "$@"; do
       echo "-h, --hr-output-dir \"<hr output dir>\" (default: ${HR_OUTPUT_DIR})"
       echo "-w, --tile-width \"<pixels>\" (default: ${MIN_TILE_WIDTH})"
       echo "-h, --tile-height \"<pixels>\" (default: ${MIN_TILE_HEIGHT})"
-      echo "-r, --random-filtering \"<1 or 0>\" (default: ${ENABLE_RANDOM_FILTERSCALE})"
+      echo "-r, --random-filtering (default: ${ENABLE_RANDOM_FILTERSCALE})"
       exit 1
     ;;
   esac
