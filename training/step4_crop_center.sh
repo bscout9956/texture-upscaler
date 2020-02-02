@@ -24,8 +24,8 @@ HR_SIZE="128x128"
 # Disable unnecessary logging if desired
 DISABLE_LOGGING="0"
 
-# Disable overwriting (may be faster, won't overwrite files that have already been processed)
-DISABLE_OVERWRITE="0"
+# Enable overwriting (Disabling might be faster, as it won't overwrite files that have already been processed)
+ENABLE_OVERWRITE="1"
 
 for OPTION in "$@"; do
   case ${OPTION} in
@@ -82,7 +82,7 @@ for OPTION in "$@"; do
     shift
     ;;
     -do|--disable-overwrite)
-    DISABLE_OVERWRITE="1"
+    ENABLE_OVERWRITE="0"
     shift
     ;;
     *)
@@ -106,6 +106,16 @@ for OPTION in "$@"; do
   esac
 done
 
+wait_for_jobs() {
+  local JOBLIST=($(jobs -p))
+  if [ "${#JOBLIST[@]}" -gt "${THREADS}" ]; then
+    for JOB in ${JOBLIST}; do
+      echo Waiting for job ${JOB}...
+      wait ${JOB}
+    done
+  fi
+}
+
 LR_VAL_TILE_COUNT=$(find "${VAL_LR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \) | wc -l)
 LR_TRAIN_TILE_COUNT=$(find "${TRAIN_LR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \) | wc -l)
 HR_VAL_TILE_COUNT=$(find "${VAL_HR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \) | wc -l)
@@ -117,27 +127,35 @@ echo "Processsing the training dataset..."
 
 INDEX_TRAIN=0
 while read FILENAME; do
-
   DIRNAME=$(dirname "${FILENAME}")
   BASENAME=$(basename "${FILENAME}")
   BASENAME_NO_EXT="${BASENAME%.*}"
   
   if [ "${INDEX_TRAIN}" -lt "${LR_TRAIN_TILE_COUNT}" ]; then
-  	if [ "${DISABLE_LOGGING}" == "0" ]; then
+    if [ "${DISABLE_LOGGING}" == "0" ]; then
       echo train LR and HR: "${BASENAME_NO_EXT}"
     fi
     
-    # Check whether the LR and HR already exist. Skip if overwite is disabled
-    if [[ ( ! -f "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}" || ! -f "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}" ) && "${DISABLE_OVERWRITE}" == "0" ]]; then
+    # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
+    if [ "${ENABLE_OVERWRITE}" == "1" ]; then
+      wait_for_jobs
       convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
+      wait_for_jobs
       convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
-    elif [ "${DISABLE_OVERWRITE}" == "1" ]; then
-      echo "${DISABLE_OVERWRITE}"
-      if [ "${DISABLE_LOGGING}" == "0" ]; then
-        echo "${BASENAME} may already exist, skipping"
+    else
+      if [[ -f "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}" && -f "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
+        if [ "${DISABLE_LOGGING}" == "0" ]; then        
+          echo "${BASENAME} already exists, skipping."      
+        fi
+        ((INDEX_TRAIN++))
+        continue
+      else
+        wait_for_jobs
+        convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
+        wait_for_jobs
+        convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
       fi
-      continue
-    fi   
+    fi 
   fi
 
   ((INDEX_TRAIN++))
@@ -157,19 +175,33 @@ while read FILENAME; do
       echo validation LR and HR: "${BASENAME_NO_EXT}"
     fi
 
-    # Check whether the LR and HR already exist. Skip if overwite is disabled
-    if [[ ( ! -f "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}" || ! -f "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}" ) && "${DISABLE_OVERWRITE}" == "0" ]]; then
+
+    # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
+    
+    if [ "${ENABLE_OVERWRITE}" == "1" ]; then
+      wait_for_jobs
       convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
+      wait_for_jobs
       convert "${VAL_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
-    elif [ "$DISABLE_OVERWRITE" == "1" ]; then
-      if [ "${DISABLE_LOGGING}" == "0" ]; then
-        echo "${BASENAME} may already exist, skipping"
+    else
+      if [[ -f "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}" && -f "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
+        if [ "${DISABLE_LOGGING}" == "0" ]; then        
+          echo "${BASENAME} already exists, skipping."      
+        fi
+        ((INDEX_VAL++))
+        continue
+      else
+        wait_for_jobs
+        convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
+        wait_for_jobs
+        convert "${VAL_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
       fi
-      continue
     fi
   fi
-
   ((INDEX_VAL++))
 done < <(find "${VAL_HR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \))
+
+wait_for_jobs
+wait
 
 echo "Finished processing"

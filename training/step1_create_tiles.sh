@@ -26,6 +26,9 @@ MAX_TILE_HEIGHT=128
 # Category regexp for Skyrim SE
 CATEGORY_REGEXP='s/.*_\(a\|b\|d\|e\|g\|h\|m\|n\|p\|s\|an\|bl\|em\|sk\|msn\|rim\)$/\1/ip'
 
+# Extra Settings
+ENABLE_RANDOM_FILTERSCALE=1
+
 for OPTION in "$@"; do
   case ${OPTION} in
     -t=*|--threads=*)
@@ -78,6 +81,10 @@ for OPTION in "$@"; do
     MAX_TILE_HEIGHT="${OPTION#*=}"
     shift
     ;;
+    -r=*|--random-filtering=*)
+    ENABLE_RANDOM_FILTERSCALE="${OPTION#*=}"
+    shift
+    ;;
     *)
       echo "usage: $@ ..."
       echo "-t, --threads \"<number>\" (default: ${THREADS})"
@@ -92,6 +99,7 @@ for OPTION in "$@"; do
       echo "-h, --hr-output-dir \"<hr output dir>\" (default: ${HR_OUTPUT_DIR})"
       echo "-w, --tile-width \"<pixels>\" (default: ${MIN_TILE_WIDTH})"
       echo "-h, --tile-height \"<pixels>\" (default: ${MIN_TILE_HEIGHT})"
+      echo "-r, --random-filtering \"<1 or 0>\" (default: ${ENABLE_RANDOM_FILTERSCALE})"
       exit 1
     ;;
   esac
@@ -106,6 +114,10 @@ wait_for_jobs() {
     done
   fi
 }
+
+if [ "$ENABLE_RANDOM_FILTERSCALE" == 1 ]; then
+  echo "Random scaling is on"
+fi
 
 while read FILENAME; do
 
@@ -139,6 +151,26 @@ while read FILENAME; do
       HORIZONTAL_SUBDIVISIONS=$((${IMAGE_WIDTH} / ${MAX_TILE_WIDTH}))
       if [ "${HORIZONTAL_SUBDIVISIONS}" -lt "1" ]; then
         HORIZONTAL_SUBDIVISIONS=$((${IMAGE_WIDTH} / ${MIN_TILE_WIDTH}))
+      fi
+      
+      if [ "$ENABLE_RANDOM_FILTERSCALE" == 1 ]; then
+        RANDOM_NUMBER_LR=$(( $RANDOM % 2 ))
+        if [ "$RANDOM_NUMBER_LR" == 0 ]; then
+          LR_FILTER=point
+          LR_INTERPOLATE=Nearest
+        else
+          LR_FILTER=Catrom
+          LR_INTERPOLATE=Catrom
+        fi
+
+        RANDOM_NUMBER_HR=$(( $RANDOM % 2 ))
+        if [ "$RANDOM_NUMBER_HR" == 0 ]; then
+          HR_FILTER=point
+          HR_INTERPOLATE=Nearest
+        else
+          HR_FILTER=Catrom
+          HR_INTERPOLATE=Catrom
+        fi
       fi
 
       if [ "$(convert "${FILENAME}" -alpha off -format "%[k]" info:)" -gt "1" ]; then
@@ -174,7 +206,7 @@ while read FILENAME; do
     echo ${FILENAME}, already processed, skipped
   fi
   
-done < <(find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.png"  \))
+done < <(find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.jpg" -or -iname "*.png"  \))
 
 wait_for_jobs
 wait
