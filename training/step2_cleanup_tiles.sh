@@ -84,7 +84,7 @@ cleanup_task() {
   IMAGE_HEIGHT=$(echo ${IMAGE_INFO} | cut -d' ' -f 2)
   IMAGE_COLORS=$(echo ${IMAGE_INFO} | cut -d' ' -f 4)
   IMAGE_CHANNELS=$(echo ${IMAGE_INFO} | cut -d' ' -f 3)
-  
+
   RELATIVE_DIR=$(realpath --relative-to "${HR_OUTPUT_DIR}" "${DIRNAME}")
 
   echo ${RELATIVE_DIR}/${BASENAME_NO_EXT} \(${IMAGE_WIDTH} ${IMAGE_HEIGHT} ${IMAGE_CHANNELS} ${IMAGE_COLORS}\)
@@ -95,7 +95,7 @@ cleanup_task() {
     rm -f ${LR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
     return
   fi
-  
+
   if [ "${IMAGE_CHANNELS}" != "rgb" ] && [ "${IMAGE_CHANNELS}" != "srgb" ]; then
     echo ${BASENAME_NO_EXT}, not rgb \(${IMAGE_CHANNELS}\), delete
     rm -f ${HR_OUTPUT_DIR}/${RELATIVE_DIR}/${BASENAME}
@@ -118,7 +118,7 @@ cleanup_task() {
   fi
 
   sleep 0.5
-  
+
 }
 
 while read FILENAME; do

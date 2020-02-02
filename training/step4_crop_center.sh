@@ -125,12 +125,12 @@ while read FILENAME; do
   DIRNAME=$(dirname "${FILENAME}")
   BASENAME=$(basename "${FILENAME}")
   BASENAME_NO_EXT="${BASENAME%.*}"
-  
+
   if [ "${INDEX_TRAIN}" -lt "${LR_TRAIN_TILE_COUNT}" ]; then
     if [ "${DISABLE_LOGGING}" == "0" ]; then
       echo train LR and HR: "${BASENAME_NO_EXT}"
     fi
-    
+
     # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
     if [ "${ENABLE_OVERWRITE}" == "1" ]; then
       wait_for_jobs
@@ -139,8 +139,8 @@ while read FILENAME; do
       convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
     else
       if [[ -f "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}" && -f "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
-        if [ "${DISABLE_LOGGING}" == "0" ]; then        
-          echo "${BASENAME} already exists, skipping."      
+        if [ "${DISABLE_LOGGING}" == "0" ]; then
+          echo "${BASENAME} already exists, skipping."
         fi
         ((INDEX_TRAIN++))
         continue
@@ -150,7 +150,7 @@ while read FILENAME; do
         wait_for_jobs
         convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
       fi
-    fi 
+    fi
   fi
 
   ((INDEX_TRAIN++))
@@ -164,7 +164,7 @@ while read FILENAME; do
   DIRNAME=$(dirname "${FILENAME}")
   BASENAME=$(basename "${FILENAME}")
   BASENAME_NO_EXT="${BASENAME%.*}"
-    
+
   if [ "${INDEX_VAL}" -lt "${LR_VAL_TILE_COUNT}" ]; then
     if [ "${DISABLE_LOGGING}" == "0" ]; then
       echo validation LR and HR: "${BASENAME_NO_EXT}"
@@ -172,7 +172,7 @@ while read FILENAME; do
 
 
     # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
-    
+
     if [ "${ENABLE_OVERWRITE}" == "1" ]; then
       wait_for_jobs
       convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
@@ -180,8 +180,8 @@ while read FILENAME; do
       convert "${VAL_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
     else
       if [[ -f "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}" && -f "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
-        if [ "${DISABLE_LOGGING}" == "0" ]; then        
-          echo "${BASENAME} already exists, skipping."      
+        if [ "${DISABLE_LOGGING}" == "0" ]; then
+          echo "${BASENAME} already exists, skipping."
         fi
         ((INDEX_VAL++))
         continue

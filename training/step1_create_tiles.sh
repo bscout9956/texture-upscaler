@@ -152,7 +152,7 @@ while read FILENAME; do
       if [ "${HORIZONTAL_SUBDIVISIONS}" -lt "1" ]; then
         HORIZONTAL_SUBDIVISIONS=$((${IMAGE_WIDTH} / ${MIN_TILE_WIDTH}))
       fi
-      
+
       if [ "$ENABLE_RANDOM_FILTERSCALE" == 1 ]; then
         RANDOM_NUMBER_LR=$(( $RANDOM % 2 ))
         if [ "$RANDOM_NUMBER_LR" == 0 ]; then
@@ -205,7 +205,7 @@ while read FILENAME; do
   else
     echo ${FILENAME}, already processed, skipped
   fi
-  
+
 done < <(find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.jpg" -or -iname "*.png"  \))
 
 wait_for_jobs
