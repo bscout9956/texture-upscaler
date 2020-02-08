@@ -1,8 +1,6 @@
 #!/bin/bash
 shopt -s extglob
 
-THREADS="4"
-
 # Examples
 LR_INPUT_DIR="./output/LR"
 
@@ -22,10 +20,6 @@ VALIDATION_LR_OUTPUT_DIR="output_validation/LR"
 
 for OPTION in "$@"; do
   case ${OPTION} in
-    -t=*|--threads=*)
-    THREADS="${OPTION#*=}"
-    shift
-    ;;
     -l=*|--lr-input-dir=*)
     LR_INPUT_DIR="${OPTION#*=}"
     shift
@@ -64,7 +58,6 @@ for OPTION in "$@"; do
     ;;
     *)
       echo "usage: $@ ..."
-      echo "-t, --threads \"<number>\" (default: ${THREADS})"
       echo "-l, --lr-input-dir \"<lr input dir>\" (default: ${LR_INPUT_DIR})"
       echo "-h, --hr-input-dir \"<hr input dir>\" (default: ${HR_INPUT_DIR})"
       echo "-tp, --training-percentage (default: ${TRAINING_PERCENTAGE})"
