@@ -1,7 +1,6 @@
 #!/bin/bash
 shopt -s extglob
 
-THREADS="4"
 INPUT_DIR="./input"
 
 # Examples
@@ -31,10 +30,6 @@ ENABLE_RANDOM_FILTERSCALE=1
 
 for OPTION in "$@"; do
   case ${OPTION} in
-    -t=*|--threads=*)
-    THREADS="${OPTION#*=}"
-    shift
-    ;;
     -i=*|--input-dir=*)
     INPUT_DIR="${OPTION#*=}"
     shift
@@ -87,7 +82,6 @@ for OPTION in "$@"; do
     ;;
     *)
       echo "usage: $@ ..."
-      echo "-t, --threads \"<number>\" (default: ${THREADS})"
       echo "-i, --input-dir \"<input dir>\" (default: ${INPUT_DIR})"
       echo "--lr-scale \"<percentage>\" (default: ${LR_SCALE})"
       echo "--lr-filter \"<filter>\" (default: ${LR_FILTER})"
@@ -104,16 +98,6 @@ for OPTION in "$@"; do
     ;;
   esac
 done
-
-wait_for_jobs() {
-  local JOBLIST=($(jobs -p))
-  if [ "${#JOBLIST[@]}" -gt "${THREADS}" ]; then
-    for JOB in ${JOBLIST}; do
-      echo Waiting for job ${JOB}...
-      wait ${JOB}
-    done
-  fi
-}
 
 if [ "$ENABLE_RANDOM_FILTERSCALE" == 1 ]; then
   echo "Random scaling is on"
@@ -177,9 +161,7 @@ while read FILENAME; do
         mkdir -p "${HR_OUTPUT_DIR}/${CATEGORY}/rgb"
         mkdir -p "${LR_OUTPUT_DIR}/${CATEGORY}/rgb"
         echo ${FILENAME}, rgb \(${IMAGE_WIDTH}x${IMAGE_HEIGHT} divided by ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}\) ${CATEGORY}
-        wait_for_jobs
         convert "${FILENAME}" -alpha off -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${HR_INTERPOLATE} -filter ${HR_FILTER} -resize ${HR_SCALE} "${HR_OUTPUT_DIR}/${CATEGORY}/rgb/${DIRNAME_HASH}_${BASENAME_NO_EXT}_%03d.png" &
-        wait_for_jobs
         convert "${FILENAME}" -alpha off -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${LR_INTERPOLATE} -filter ${LR_FILTER} -resize ${LR_SCALE} "${LR_OUTPUT_DIR}/${CATEGORY}/rgb/${DIRNAME_HASH}_${BASENAME_NO_EXT}_%03d.png" &
       else
         echo ${FILENAME}, rgb single color, skipped
@@ -189,9 +171,7 @@ while read FILENAME; do
           mkdir -p "${HR_OUTPUT_DIR}/${CATEGORY}/alpha"
           mkdir -p "${LR_OUTPUT_DIR}/${CATEGORY}/alpha"
           echo ${FILENAME}, alpha \(${IMAGE_WIDTH}x${IMAGE_HEIGHT} divided by ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}\) ${CATEGORY}
-          wait_for_jobs
           convert "${FILENAME}" -alpha extract -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${HR_INTERPOLATE} -filter ${HR_FILTER} -resize ${HR_SCALE} "${HR_OUTPUT_DIR}/${CATEGORY}/alpha/${DIRNAME_HASH}_${BASENAME_NO_EXT}_alpha_%03d.png" &
-          wait_for_jobs
           convert "${FILENAME}" -alpha extract -crop ${HORIZONTAL_SUBDIVISIONS}x${VERTICAL_SUBDIVISIONS}@ +repage +adjoin -define png:color-type=2 -interpolate ${LR_INTERPOLATE} -filter ${LR_FILTER} -resize ${LR_SCALE} "${LR_OUTPUT_DIR}/${CATEGORY}/alpha/${DIRNAME_HASH}_${BASENAME_NO_EXT}_alpha_%03d.png" &
         else
           echo ${FILENAME}, alpha single color, skipped
@@ -207,8 +187,5 @@ while read FILENAME; do
   fi
 
 done < <(find "${INPUT_DIR}" \( -iname "*.dds" -or -iname "*.jpg" -or -iname "*.png"  \))
-
-wait_for_jobs
-wait
 
 echo "finished"
