@@ -1,8 +1,6 @@
 #!/bin/bash
 shopt -s extglob
 
-THREADS="4"
-
 # Examples
 VAL_LR_INPUT_DIR="./output_validation/LR"
 TRAIN_LR_INPUT_DIR="./output_training/LR"
@@ -29,10 +27,6 @@ ENABLE_OVERWRITE="1"
 
 for OPTION in "$@"; do
   case ${OPTION} in
-    -t=*|--threads=*)
-    THREADS="${OPTION#*=}"
-    shift
-    ;;
     -vl=*|--val-lr-input-dir=*)
     VAL_LR_INPUT_DIR="${OPTION#*=}"
     shift
@@ -83,7 +77,6 @@ for OPTION in "$@"; do
     ;;
     *)
       echo "usage: $@ ..."
-      echo "-t, --threads \"<number>\" (default: ${THREADS})"
       echo "-vl, --val-lr-input-dir \"<val lr input dir>\" (default: ${VAL_LR_INPUT_DIR})"
       echo "-vh, --val-hr-input-dir \"<val hr input dir>\" (default: ${VAL_HR_INPUT_DIR})"
       echo "-tl, --train-lr-input-dir \"<train lr input dir>\" (default: ${TRAIN_LR_INPUT_DIR})"
@@ -100,16 +93,6 @@ for OPTION in "$@"; do
     ;;
   esac
 done
-
-wait_for_jobs() {
-  local JOBLIST=($(jobs -p))
-  if [ "${#JOBLIST[@]}" -gt "${THREADS}" ]; then
-    for JOB in ${JOBLIST}; do
-      echo Waiting for job ${JOB}...
-      wait ${JOB}
-    done
-  fi
-}
 
 LR_VAL_TILE_COUNT=$(find "${VAL_LR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \) | wc -l)
 LR_TRAIN_TILE_COUNT=$(find "${TRAIN_LR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \) | wc -l)
@@ -133,9 +116,7 @@ while read FILENAME; do
 
     # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
     if [ "${ENABLE_OVERWRITE}" == "1" ]; then
-      wait_for_jobs
-      convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
-      wait_for_jobs
+      convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"      
       convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
     else
       if [[ -f "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}" && -f "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
@@ -144,10 +125,8 @@ while read FILENAME; do
         fi
         ((INDEX_TRAIN++))
         continue
-      else
-        wait_for_jobs
-        convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
-        wait_for_jobs
+      else        
+        convert "${TRAIN_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"        
         convert "${TRAIN_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
       fi
     fi
@@ -170,13 +149,10 @@ while read FILENAME; do
       echo validation LR and HR: "${BASENAME_NO_EXT}"
     fi
 
-
     # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
 
-    if [ "${ENABLE_OVERWRITE}" == "1" ]; then
-      wait_for_jobs
-      convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
-      wait_for_jobs
+    if [ "${ENABLE_OVERWRITE}" == "1" ]; then      
+      convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"      
       convert "${VAL_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
     else
       if [[ -f "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}" && -f "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}" ]]; then
@@ -185,18 +161,13 @@ while read FILENAME; do
         fi
         ((INDEX_VAL++))
         continue
-      else
-        wait_for_jobs
-        convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
-        wait_for_jobs
+      else        
+        convert "${VAL_LR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${LR_SIZE}"+0+0 +repage "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"        
         convert "${VAL_HR_INPUT_DIR}/${BASENAME}" -gravity Center -crop "${HR_SIZE}"+0+0 +repage "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
       fi
     fi
   fi
   ((INDEX_VAL++))
 done < <(find "${VAL_HR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \))
-
-wait_for_jobs
-wait
 
 echo "Finished processing"
