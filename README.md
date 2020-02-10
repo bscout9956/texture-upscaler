@@ -158,3 +158,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - Python modules: numpy opencv-python torchvision tensorflow tensorboardX lmdb
  - BasicSR: https://github.com/xinntao/BasicSR/
 
+### Observations about this fork
+ - Some of the changes made by me (BlackScout/bscout9956) may be questionable, unreasonable and unnecessary. 
+   - The removal of the thread-limiter code as I faced slightly reduced performance. Even with the maximum amount possible set on my system.
+   - The script Step 4 may be easily overriden by the non-training Step 1 but it may not offer the same amount of control.
