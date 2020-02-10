@@ -26,7 +26,8 @@ MAX_TILE_HEIGHT=128
 CATEGORY_REGEXP='s/.*_\(a\|b\|d\|e\|g\|h\|m\|n\|p\|s\|an\|bl\|em\|sk\|msn\|rim\)$/\1/ip'
 
 # Extra Settings
-ENABLE_RANDOM_FILTERSCALE=1
+ENABLE_RANDOM_FILTERSCALE_LR=1
+ENABLE_RANDOM_FILTERSCALE_HR=1
 
 for OPTION in "$@"; do
   case ${OPTION} in
@@ -99,8 +100,16 @@ for OPTION in "$@"; do
   esac
 done
 
-if [ "$ENABLE_RANDOM_FILTERSCALE" == 1 ]; then
-  echo "Random scaling is on"
+# Ugly but works
+
+if [[ "$ENABLE_RANDOM_FILTERSCALE_LR" == 1 || "$ENABLE_RANDOM_FILTERSCALE_HR" == 1 ]]; then
+  echo "Random scaling is on for:"
+  if [ "$ENABLE_RANDOM_FILTERSCALE_LR" == 1 ]; then
+    echo "LR"
+  fi
+  if [ "$ENABLE_RANDOM_FILTERSCALE_HR" == 1 ]; then
+    echo "HR"
+  fi
 fi
 
 while read FILENAME; do
@@ -137,7 +146,7 @@ while read FILENAME; do
         HORIZONTAL_SUBDIVISIONS=$((${IMAGE_WIDTH} / ${MIN_TILE_WIDTH}))
       fi
 
-      if [ "$ENABLE_RANDOM_FILTERSCALE" == 1 ]; then
+      if [ "$ENABLE_RANDOM_FILTERSCALE_LR" == 1 ]; then
         RANDOM_NUMBER_LR=$(( $RANDOM % 2 ))
         if [ "$RANDOM_NUMBER_LR" == 0 ]; then
           LR_FILTER=point
@@ -146,7 +155,9 @@ while read FILENAME; do
           LR_FILTER=Catrom
           LR_INTERPOLATE=Catrom
         fi
+      fi
 
+      if [ "$ENABLE_RANDOM_FILTERSCALE_HR" == 1 ]; then
         RANDOM_NUMBER_HR=$(( $RANDOM % 2 ))
         if [ "$RANDOM_NUMBER_HR" == 0 ]; then
           HR_FILTER=point
