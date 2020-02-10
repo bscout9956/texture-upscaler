@@ -1,8 +1,6 @@
 #!/bin/bash
 shopt -s extglob
 
-THREADS="16"
-
 # Min colors treshold
 MIN_COLORS=8
 
@@ -21,10 +19,6 @@ HR_OUTPUT_DIR="./output/HR"
 
 for OPTION in "$@"; do
   case ${OPTION} in
-    -t=*|--threads=*)
-    THREADS="${OPTION#*=}"
-    shift
-    ;;
     -mc=*|--min-colors=*)
     MIN_COLORS="${OPTION#*=}"
     shift
@@ -59,16 +53,6 @@ for OPTION in "$@"; do
     ;;
   esac
 done
-
-wait_for_jobs() {
-  local JOBLIST=($(jobs -p))
-  if [ "${#JOBLIST[@]}" -gt "${THREADS}" ]; then
-    for JOB in ${JOBLIST}; do
-      echo Waiting for job ${JOB}...
-      wait ${JOB}
-    done
-  fi
-}
 
 cleanup_task() {
 
@@ -120,11 +104,7 @@ cleanup_task() {
 }
 
 while read FILENAME; do
- wait_for_jobs
  cleanup_task ${FILENAME} &
 done < <(find "${HR_OUTPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \))
-
-wait_for_jobs
-wait
 
 echo "finished"
