@@ -117,8 +117,6 @@ cleanup_task() {
     return
   fi
 
-  sleep 0.5
-
 }
 
 while read FILENAME; do
