@@ -27,7 +27,7 @@ CATEGORY_REGEXP='s/.*_\(a\|b\|d\|e\|g\|h\|m\|n\|p\|s\|an\|bl\|em\|sk\|msn\|rim\)
 
 # Extra Settings
 ENABLE_RANDOM_FILTERSCALE_LR=1
-ENABLE_RANDOM_FILTERSCALE_HR=1
+ENABLE_RANDOM_FILTERSCALE_HR=0
 
 for OPTION in "$@"; do
   case ${OPTION} in
@@ -146,25 +146,29 @@ while read FILENAME; do
         HORIZONTAL_SUBDIVISIONS=$((${IMAGE_WIDTH} / ${MIN_TILE_WIDTH}))
       fi
 
-      if [ "$ENABLE_RANDOM_FILTERSCALE_LR" == 1 ]; then
-        RANDOM_NUMBER_LR=$(( $RANDOM % 2 ))
-        if [ "$RANDOM_NUMBER_LR" == 0 ]; then
-          LR_FILTER=point
-          LR_INTERPOLATE=Nearest
-        else
-          LR_FILTER=Catrom
-          LR_INTERPOLATE=Catrom
-        fi
-      fi
+      # Skip it all if it's 0 for both
 
-      if [ "$ENABLE_RANDOM_FILTERSCALE_HR" == 1 ]; then
-        RANDOM_NUMBER_HR=$(( $RANDOM % 2 ))
-        if [ "$RANDOM_NUMBER_HR" == 0 ]; then
-          HR_FILTER=point
-          HR_INTERPOLATE=Nearest
-        else
-          HR_FILTER=Catrom
-          HR_INTERPOLATE=Catrom
+      if [[ "$ENABLE_RANDOM_FILTERSCALE_LR" == 1 || "$ENABLE_RANDOM_FILTERSCALE_HR" == 1 ]]; then
+        if [ "$ENABLE_RANDOM_FILTERSCALE_LR" == 1 ]; then
+          RANDOM_NUMBER_LR=$(( $RANDOM % 2 ))
+          if [ "$RANDOM_NUMBER_LR" == 0 ]; then
+            LR_FILTER=point
+            LR_INTERPOLATE=Nearest
+          else
+            LR_FILTER=Catrom
+            LR_INTERPOLATE=Catrom
+          fi
+        fi
+
+        if [ "$ENABLE_RANDOM_FILTERSCALE_HR" == 1 ]; then
+          RANDOM_NUMBER_HR=$(( $RANDOM % 2 ))
+          if [ "$RANDOM_NUMBER_HR" == 0 ]; then
+            HR_FILTER=point
+            HR_INTERPOLATE=Nearest
+          else
+            HR_FILTER=Catrom
+            HR_INTERPOLATE=Catrom
+          fi
         fi
       fi
 
