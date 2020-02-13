@@ -21,6 +21,7 @@ HR_SIZE="128x128"
 
 # Disable unnecessary logging if desired
 DISABLE_LOGGING="0"
+CLEAN_OUTPUT="1"
 
 # Enable overwriting (Disabling might be faster, as it won't overwrite files that have already been processed)
 ENABLE_OVERWRITE="1"
@@ -39,7 +40,7 @@ for OPTION in "$@"; do
     TRAIN_LR_INPUT_DIR="${OPTION#*=}"
     shift
     ;;
-    -tl=*|--train-hr-input-dir=*)
+    -th=*|--train-hr-input-dir=*)
     TRAIN_HR_INPUT_DIR="${OPTION#*=}"
     shift
     ;;
@@ -110,8 +111,15 @@ while read FILENAME; do
   BASENAME_NO_EXT="${BASENAME%.*}"
 
   if [ "${INDEX_TRAIN}" -lt "${LR_TRAIN_TILE_COUNT}" ]; then
-    if [ "${DISABLE_LOGGING}" == "0" ]; then
+    if [[ "${DISABLE_LOGGING}" == "0" || "${CLEAN_OUTPUT}" == "0" ]]; then
       echo train LR and HR: "${BASENAME_NO_EXT}"
+    fi
+    
+    if [ "${CLEAN_OUTPUT}" == "0" ]; then
+      echo train LR and HR: "${BASENAME_NO_EXT}"
+    else
+      clear
+      echo "Processed picture ${INDEX_TRAIN} out of ${LR_TRAIN_TILE_COUNT} of the training dataset."
     fi
 
     # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
@@ -145,8 +153,15 @@ while read FILENAME; do
   BASENAME_NO_EXT="${BASENAME%.*}"
 
   if [ "${INDEX_VAL}" -lt "${LR_VAL_TILE_COUNT}" ]; then
-    if [ "${DISABLE_LOGGING}" == "0" ]; then
-      echo validation LR and HR: "${BASENAME_NO_EXT}"
+    if [[ "${DISABLE_LOGGING}" == "0" || "${CLEAN_OUTPUT}" == "0" ]]; then
+      echo val LR and HR: "${BASENAME_NO_EXT}"
+    fi
+    
+    if [ "${CLEAN_OUTPUT}" == "0" ]; then
+      echo val LR and HR: "${BASENAME_NO_EXT}"
+    else
+      clear
+      echo "Processed picture ${INDEX_VAL} out of ${LR_VAL_TILE_COUNT} of the validation dataset."
     fi
 
     # Check whether the LR and HR already exists. Skip existing files if overwrite is disabled.
