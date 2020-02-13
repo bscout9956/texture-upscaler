@@ -18,8 +18,18 @@ VALIDATION_HR_OUTPUT_DIR="output_validation/HR"
 TRAINING_LR_OUTPUT_DIR="output_training/LR"
 VALIDATION_LR_OUTPUT_DIR="output_validation/LR"
 
+# Extra Options
+
+# Clean output allows for a simple output that makes more sense to user executing the script.
+
+CLEAN_OUTPUT=1
+
 for OPTION in "$@"; do
   case ${OPTION} in
+    -v|--verbose)
+    CLEAN_OUTPUT=0
+    shift
+    ;;
     -l=*|--lr-input-dir=*)
     LR_INPUT_DIR="${OPTION#*=}"
     shift
@@ -58,6 +68,7 @@ for OPTION in "$@"; do
     ;;
     *)
       echo "usage: $@ ..."
+      echo "-v, --verbose (default: off)"
       echo "-l, --lr-input-dir \"<lr input dir>\" (default: ${LR_INPUT_DIR})"
       echo "-h, --hr-input-dir \"<hr input dir>\" (default: ${HR_INPUT_DIR})"
       echo "-tp, --training-percentage (default: ${TRAINING_PERCENTAGE})"
@@ -95,11 +106,21 @@ while read FILENAME; do
   RELATIVE_DIR=$(realpath --relative-to "${HR_INPUT_DIR}" "${DIRNAME}")
 
   if [ "${INDEX}" -lt "${TRAINING_COUNT}" ]; then
-    echo training: ${RELATIVE_DIR}/${BASENAME_NO_EXT}
+    if [ "${CLEAN_OUTPUT}" == "0" ]; then
+      echo training: ${RELATIVE_DIR}/${BASENAME_NO_EXT}
+    else
+      clear
+      echo "Processed picture ${INDEX} out of ${TRAINING_COUNT} of the training dataset."
+    fi
     cp -a "${HR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
     cp -a "${LR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
   else
-    echo validation: ${RELATIVE_DIR}/${BASENAME_NO_EXT}
+    if [ "${CLEAN_OUTPUT}" == "0" ]; then
+      echo validation: ${RELATIVE_DIR}/${BASENAME_NO_EXT}
+    else
+      clear
+      echo "Processed picture ${INDEX} out of ${VALIDATION_COUNT} of the training dataset."
+    fi
     cp -a "${HR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
     cp -a "${LR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
   fi
