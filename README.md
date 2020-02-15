@@ -111,7 +111,9 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  **Note:** Everything works much better on Linux
 
 ## Usage for training ESRGAN and/or SFTGAN
-
+ - There's a work in progress new methodology based on the works of deorder which aims to be a better choice when it comes to performance and ease of use.
+ - It can be seen in Method 2 below
+### Method 1:
  - Put all textures you want to use for training in `./training/input`
  - Go to the `./training` directory
  - `./step1_create_tiles.sh`
@@ -136,7 +138,31 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - Results will be inside `<basicsr path>/experiments`, after every X iterations it will write some validation results
  - If you are happy with the validation results you can stop the training using Ctrl+C
  - If you want to continue training make sure that in `train_ESRGAN.json` the `resume_state` is set in `path` pointing to the state file `<basicsr path>/experiments/<name>/training_state/<state file>.state` you want to continue training from
- 
+
+### Method 2:
+  - Make sure you have pillow installed by using `pip install pillow`
+  - Go to the `./training` directory
+  - Run under CMD or IDLE or wherever: prepare_dataset.py
+    - i.e: `python3 prepare_dataset.py`
+    - Note: It may kill alpha textures, transparency and will crop some of the image (to the right) if it's not a multiple of 2.
+  - The HR and LR results will be inside the `./output` directory.
+    - All the images will be RGB and square.
+  - Run `./step3_select_tiles.sh` (Will be superseeded in the future)
+  - End result will be inside `./training/output_training` and `./training/output_validation`
+  - Go to `<basicsr path>/codes` and modify the `options/train/train_ESRGAN.json` file as follows:
+   - Change the `name` to something else that has no `debug` in it.
+   - In `train` you may want to decrease the `n_workers` and `batch_size` values to for ex.: 4 and 8
+   - In `train` point the `dataroot_LR` to `<path>/training/output_training/LR`
+   - In `train` point the `dataroot_HR` to `<path>/training/output_training/HR`
+   - In `val` point the `dataroot_LR` to `<path>/training/output_validation/LR`
+   - In `val` point the `dataroot_HR` to `<path>/training/output_validation/HR`
+   - In `path` change `root` to the folder where BasicSR is installed
+   - In `path` you may have to remove `resume_state` for now
+   - In `<basicsr path>/codes` run the following: `python3 train.py -opt options/train/train_ESRGAN.json`
+   - Results will be inside `<basicsr path>/experiments`, after every X iterations it will write some validation results
+   - If you are happy with the validation results you can stop the training using Ctrl+C
+   - If you want to continue training make sure that in `train_ESRGAN.json` the `resume_state` is set in `path` pointing to the state file `<basicsr path>/experiments/<name>/training_state/<state file>.state` you want to continue training from
+
 ## Troubleshooting
 
 - You may have to increase some of the values in Image Magick's `policy.xml` file to allow for more memory to be used.
@@ -146,6 +172,8 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 ## Requirements
  - Bash (if you do not have Linux you can try the Git for Window's Bash instead)
  - Image Magick 6 (Image Magick 7 does not work with this script yet): https://imagemagick.org/download/binaries/ImageMagick-6.9.10-44-Q8-x64-dll.exe
+ - If using Method 2 for training:
+   - `pip install pillow` is required
 
 ### Required if you want to use ESRGAN and/or SFTGAN
  - Cuda (optional, but recommended if you have an NVidia) (On Linux you can just install the latest NVidia drivers)
