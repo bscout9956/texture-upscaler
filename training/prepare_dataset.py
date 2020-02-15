@@ -1,14 +1,16 @@
 # TODO: Improve variable names and imports
 
 from PIL import Image as Im
+from PIL import ImageFile
 import os
 import random
 import time
 from math import floor
 
-# Helper Variable for OS Compatibility (hack)
+# Helper Variables and Flags
 
 slash = "\\" if os.name == 'nt' else "/"
+ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # Folders
 
@@ -20,16 +22,17 @@ output_folder = "." + slash + "output"
 scale = 4
 hr_size = 128
 lr_size = hr_size / scale
+random_lr_scaling = True
 
 # Indexes
 
 rgb_index = 0
 
 
-def get_random_number():
+def get_random_number(start, end):
     # Use time as a seed, makes it more randomized :)
     random.seed(time.time_ns())
-    return random.randint(1, 100)
+    return random.randint(start, end)
 
 
 def check_file_count(ifolder):
@@ -37,6 +40,13 @@ def check_file_count(ifolder):
     for root, dirs, files in os.walk(ifolder):
         file_count += len(files)
     return file_count
+
+
+def get_filter():
+    if get_random_number(0, 1) == 0:
+        return "NEAREST"
+    else:
+        return "BICUBIC"
 
 
 def process_hr(image, filename):
@@ -74,8 +84,11 @@ def process_lr(image, filename):
             for j in range(0, h_divs):
                 # print(lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1))
                 imagecopy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
-                imagecopy = imagecopy.resize((lr_size, lr_size), 0)
-                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png","PNG")
+                if random_lr_scaling:
+                    imagecopy = imagecopy.resize((lr_size, lr_size), get_filter())
+                else:
+                    imagecopy = imagecopy.resize((lr_size, lr_size), 0)
+                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG")
 
 
 def process_images(image_path, pic_name):
