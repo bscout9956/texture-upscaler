@@ -30,7 +30,7 @@ rgb_index = 0
 
 
 def get_random_number(start, end):
-    # Use time as a seed, makes it more randomized :)
+    # Use time as a seed, makes it more randomized
     random.seed(time.time_ns())
     return random.randint(start, end)
 
@@ -52,7 +52,7 @@ def get_filter():
 def process_hr(image, filename):
     opt_dir = output_folder + slash + "hr"
 
-    # I am too dumb to understand how to make this properly. Submit a Pull Request if you know better.
+    # I am not sure how to make this properly. Submit a Pull Request if you find an alternative.
 
     h_divs = floor(image.width / hr_size)
     v_divs = floor(image.height / hr_size)
@@ -61,9 +61,11 @@ def process_hr(image, filename):
         for i in range(0, v_divs):
             for j in range(0, h_divs):
                 # print(hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1))
-                imagecopy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
-                imagecopy.save(opt_dir + slash + filename.replace(".png", "") + "tile_0{}{}".format(i, j) + ".png",
-                               "PNG")
+                try:
+                    imagecopy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
+                except OSError:
+                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
+                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png","PNG")
     else:
         os.makedirs(opt_dir)
         return process_hr(image, filename)
@@ -83,7 +85,10 @@ def process_lr(image, filename):
         for i in range(0, v_divs):
             for j in range(0, h_divs):
                 # print(lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1))
-                imagecopy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
+                try:
+                    imagecopy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
+                except OSError:
+                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
                 if random_lr_scaling:
                     imagecopy = imagecopy.resize((lr_size, lr_size), get_filter())
                 else:
