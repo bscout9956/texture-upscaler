@@ -22,7 +22,8 @@ output_folder = "." + slash + "output"
 scale = 4
 hr_size = 128
 lr_size = hr_size / scale
-random_lr_scaling = True
+random_lr_scaling = False
+# TODO: Add scaling settings for LR
 
 # Indexes
 
@@ -65,7 +66,7 @@ def process_hr(image, filename):
                     imagecopy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
                 except OSError:
                     print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
-                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png","PNG")
+                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png","PNG",icc_profile=image.info.get('icc_profile')
     else:
         os.makedirs(opt_dir)
         return process_hr(image, filename)
