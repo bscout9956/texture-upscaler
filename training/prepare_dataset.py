@@ -19,9 +19,10 @@ output_folder = "." + slash + "output"
 
 scale = 4
 hr_size = 128
-lr_size = hr_size / scale
+lr_size = int(hr_size / scale)
 random_lr_scaling = False
-lr_scaling = "NEAREST"
+lr_scaling = 0  # Use Image.NEAREST (0), Image.LANCZOS (1), Image.BILINEAR (2), Image.BICUBIC (3), Image.BOX (4) or
+                # Image.HAMMING (5)
 
 # Indexes
 
@@ -44,9 +45,9 @@ def check_file_count(ifolder):
 def get_filter():
     if random_lr_scaling:
         if get_random_number(0, 1) == 0:
-            return "NEAREST"
+            return int(0)
         else:
-            return "BICUBIC"
+            return int(3)
     else:
         return lr_scaling
 
