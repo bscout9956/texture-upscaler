@@ -66,7 +66,7 @@ def process_hr(image, filename):
                     imagecopy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
                 except OSError:
                     print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
-                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png","PNG",icc_profile=image.info.get('icc_profile')
+                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png","PNG",icc_profile=image.info.get('icc_profile'))
     else:
         os.makedirs(opt_dir)
         return process_hr(image, filename)
