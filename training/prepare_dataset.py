@@ -65,8 +65,10 @@ def process_hr(image, filename):
                 try:
                     imagecopy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
                 except OSError:
-                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
-                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png","PNG",icc_profile=image.info.get('icc_profile'))
+                    print(
+                        "It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
+                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                               icc_profile=image.info.get('icc_profile'))
     else:
         os.makedirs(opt_dir)
         return process_hr(image, filename)
@@ -89,7 +91,8 @@ def process_lr(image, filename):
                 try:
                     imagecopy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
                 except OSError:
-                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
+                    print(
+                        "It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
                 if random_lr_scaling:
                     imagecopy = imagecopy.resize((lr_size, lr_size), get_filter())
                 else:
@@ -97,17 +100,18 @@ def process_lr(image, filename):
                 imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG")
 
 
-def process_images(image_path, pic_name):
-    global rgb_index
-    picture = Im.open(image_path, "r")
-    if picture.mode != "RGB":
-        picture = picture.convert(mode="RGB")
-        rgb_index += 1
-    process_lr(picture, pic_name)
-    process_hr(picture, pic_name)
+# def process_images(image_path, pic_name):
+# global rgb_index
+# picture = Im.open(image_path, "r")
+# if picture.mode != "RGB":
+# picture = picture.convert(mode="RGB")
+# rgb_index += 1
+# process_lr(picture, pic_name)
+# process_hr(picture, pic_name)
 
 
 def main():
+    global rgb_index
     file_count = check_file_count(input_folder)
     index = 1
     failed_index = 0
@@ -115,7 +119,14 @@ def main():
         if filename.endswith("jpg") or filename.endswith("dds") or filename.endswith("png"):
             print("Processing Picture {} of {}".format(index, file_count))
             pic_path = input_folder + slash + filename
-            process_images(pic_path, filename)
+            picture = Im.open(pic_path, "r")
+            if picture.mode != "RGB":
+                picture = picture.convert(mode="RGB")
+                rgb_index += 1
+            process_lr(picture, filename)
+            process_hr(picture, filename)
+
+            # process_images(pic_path, filename)
             index += 1
     print("{} pictures were converted to RGB.".format(rgb_index))
 
