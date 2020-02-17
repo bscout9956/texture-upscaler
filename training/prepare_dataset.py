@@ -68,9 +68,9 @@ def process_image(image, filename):
                 image_copy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
                 image_lr = image_copy.resize((lr_size, lr_size), get_filter())
                 image_hr = image_copy
-                image_lr.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                image_lr.save(lr_output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
                               icc_profile=image.info.get('icc_profile'))
-                image_hr.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                image_hr.save(hr_output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
                               icc_profile=image.info.get('icc_profile'))
 
 
