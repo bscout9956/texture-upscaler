@@ -1,15 +1,13 @@
-# TODO: Improve variable names and imports
-
 from PIL import Image as Im
 from PIL import ImageFile
-import os
+from os import walk, path, makedirs, listdir, name
 import random
 import time
 from math import floor
 
 # Helper Variables and Flags
 
-slash = "\\" if os.name == 'nt' else "/"
+slash = "\\" if name == 'nt' else "/"
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
 # Folders
@@ -38,7 +36,7 @@ def get_random_number(start, end):
 
 def check_file_count(ifolder):
     file_count = 0
-    for root, dirs, files in os.walk(ifolder):
+    for root, dirs, files in walk(ifolder):
         file_count += len(files)
     return file_count
 
@@ -49,6 +47,8 @@ def get_filter():
     else:
         return "BICUBIC"
 
+# TODO: Condense process_hr and process_lr into one thing
+
 
 def process_hr(image, filename):
     opt_dir = output_folder + slash + "hr"
@@ -58,19 +58,22 @@ def process_hr(image, filename):
     h_divs = floor(image.width / hr_size)
     v_divs = floor(image.height / hr_size)
 
-    if os.path.isdir(opt_dir):
+    if path.isdir(opt_dir):
         for i in range(0, v_divs):
             for j in range(0, h_divs):
-                # print(hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1))
+                """ 
+                Useful for 'debugging'
+                print(hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1))
+                """
                 try:
-                    imagecopy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
+                    image_copy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
                 except OSError:
                     print(
                         "It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
-                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
-                               icc_profile=image.info.get('icc_profile'))
+                image_copy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                                icc_profile=image.info.get('icc_profile'))
     else:
-        os.makedirs(opt_dir)
+        makedirs(opt_dir)
         return process_hr(image, filename)
 
 
@@ -82,22 +85,22 @@ def process_lr(image, filename):
     h_divs = floor(image.width / lr_size)
     v_divs = floor(image.height / lr_size)
 
-    if not os.path.isdir(opt_dir):
-        os.makedirs(opt_dir)
+    if not path.isdir(opt_dir):
+        makedirs(opt_dir)
     else:
         for i in range(0, v_divs):
             for j in range(0, h_divs):
                 # print(lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1))
                 try:
-                    imagecopy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
+                    image_copy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
                 except OSError:
                     print(
                         "It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
                 if random_lr_scaling:
-                    imagecopy = imagecopy.resize((lr_size, lr_size), get_filter())
+                    image_copy = image_copy.resize((lr_size, lr_size), get_filter())
                 else:
-                    imagecopy = imagecopy.resize((lr_size, lr_size), 0)
-                imagecopy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG")
+                    image_copy = image_copy.resize((lr_size, lr_size), 0)
+                image_copy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG")
 
 
 # def process_images(image_path, pic_name):
@@ -114,8 +117,7 @@ def main():
     global rgb_index
     file_count = check_file_count(input_folder)
     index = 1
-    failed_index = 0
-    for filename in os.listdir(input_folder):
+    for filename in listdir(input_folder):
         if filename.endswith("jpg") or filename.endswith("dds") or filename.endswith("png"):
             print("Processing Picture {} of {}".format(index, file_count))
             pic_path = input_folder + slash + filename
