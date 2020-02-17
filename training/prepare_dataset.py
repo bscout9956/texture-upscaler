@@ -56,28 +56,22 @@ def process_image(image, filename):
     lr_output_dir = output_dir + "lr"
     hr_output_dir = output_dir + "hr"
 
-    h_lr_divs = floor(image.width / lr_size)
-    v_lr_divs = floor(image.height / lr_size)
-    h_hr_divs = floor(image.width / hr_size)
-    v_hr_divs = floor(image.height / hr_size)
+    h_divs = floor(image.width / hr_size)
+    v_divs = floor(image.height / hr_size)
 
     if not path.isdir(output_dir):
         makedirs(lr_output_dir)
         makedirs(hr_output_dir)
     else:
-        # LR
-        for i in range(v_lr_divs):
-            for j in range(h_lr_divs):
-                image_copy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
-                image_copy = image_copy.resize((lr_size, lr_size), get_filter())
-                image_copy.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
-                                icc_profile=image.info.get('icc_profile'))
-        # HR
-        for i in range(v_hr_divs):
-            for j in range(h_hr_divs):
+        for i in range(v_divs):
+            for j in range(h_divs):
                 image_copy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
-                image_copy.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
-                                icc_profile=image.info.get('icc_profile'))
+                image_lr = image_copy.resize((lr_size, lr_size), get_filter())
+                image_hr = image_copy
+                image_lr.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                              icc_profile=image.info.get('icc_profile'))
+                image_hr.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                              icc_profile=image.info.get('icc_profile'))
 
 
 def main():
