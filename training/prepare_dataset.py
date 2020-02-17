@@ -47,60 +47,46 @@ def get_filter():
     else:
         return "BICUBIC"
 
-# TODO: Condense process_hr and process_lr into one thing
 
+def process_image(image, filename):
+    output_dir = output_folder + slash
+    lr_output_dir = output_dir + "lr"
+    hr_output_dir = output_dir + "hr"
 
-def process_hr(image, filename):
-    opt_dir = output_folder + slash + "hr"
+    h_lr_divs = floor(image.width / lr_size)
+    v_lr_divs = floor(image.height / lr_size)
+    h_hr_divs = floor(image.width / hr_size)
+    v_hr_divs = floor(image.height / hr_size)
 
-    # I am not sure how to make this properly. Submit a Pull Request if you find an alternative.
-
-    h_divs = floor(image.width / hr_size)
-    v_divs = floor(image.height / hr_size)
-
-    if path.isdir(opt_dir):
-        for i in range(0, v_divs):
-            for j in range(0, h_divs):
-                """ 
-                Useful for 'debugging'
-                print(hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1))
-                """
-                try:
-                    image_copy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
-                except OSError:
-                    print(
-                        "It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
-                image_copy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
-                                icc_profile=image.info.get('icc_profile'))
+    if not path.isdir(output_dir):
+        makedirs(lr_output_dir)
+        makedirs(hr_output_dir)
     else:
-        makedirs(opt_dir)
-        return process_hr(image, filename)
-
-
-def process_lr(image, filename):
-    opt_dir = output_folder + slash + "lr"
-
-    # May crop the right side of the image... For now, that's it.
-
-    h_divs = floor(image.width / lr_size)
-    v_divs = floor(image.height / lr_size)
-
-    if not path.isdir(opt_dir):
-        makedirs(opt_dir)
-    else:
-        for i in range(0, v_divs):
-            for j in range(0, h_divs):
+        # LR
+        for i in range(v_lr_divs):
+            for j in range(h_lr_divs):
                 # print(lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1))
                 try:
                     image_copy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
                 except OSError:
-                    print(
-                        "It is possible that a corrupt or truncated image has been found. Skipping {}".format(filename))
+                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(
+                        filename))
                 if random_lr_scaling:
                     image_copy = image_copy.resize((lr_size, lr_size), get_filter())
                 else:
                     image_copy = image_copy.resize((lr_size, lr_size), 0)
-                image_copy.save(opt_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG")
+                image_copy.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                                icc_profile=image.info.get('icc_profile'))
+        # HR
+        for i in range(v_hr_divs):
+            for j in range(h_hr_divs):
+                try:
+                    image_copy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
+                except OSError:
+                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(
+                        filename))
+                image_copy.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
+                                icc_profile=image.info.get('icc_profile'))
 
 
 # def process_images(image_path, pic_name):
@@ -125,8 +111,7 @@ def main():
             if picture.mode != "RGB":
                 picture = picture.convert(mode="RGB")
                 rgb_index += 1
-            process_lr(picture, filename)
-            process_hr(picture, filename)
+            process_image(picture, filename)
 
             # process_images(pic_path, filename)
             index += 1
