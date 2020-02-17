@@ -62,7 +62,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 ### If you want to train SFTGAN and/or SFTGAN
 
  - Install BasicSR to `./basicsr`
- - Follow the instructions for installing BasicSR at: https://github.com/xinntao/BasicSR
+ - Follow the instructions for installing BasicSR at: https://github.com/rlaPHOENiX/BasicSR
 
 ## Usage for inference/upscaling with ESRGAN and/or SFTGAN
 
@@ -171,7 +171,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
 
 ## Requirements
  - Bash (if you do not have Linux you can try the Git for Window's Bash instead)
- - Image Magick 6 (Image Magick 7 does not work with this script yet): https://imagemagick.org/download/binaries/ImageMagick-6.9.10-44-Q8-x64-dll.exe
+ - Image Magick 6 (Image Magick 7 does not work with this script yet): https://imagemagick.org/download/binaries/ImageMagick-6.9.10-93-Q8-x64-dll.exe
  - If using Method 2 for training:
    - `pip install pillow` is required
 
@@ -184,7 +184,7 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  
 ### Required if you want to train ESRGAN
  - Python modules: numpy opencv-python torchvision tensorflow tensorboardX lmdb
- - BasicSR: https://github.com/xinntao/BasicSR/
+ - BasicSR: https://github.com/rlaPHOENiX/BasicSR
 
 ## Observations about this fork
  - Some of the changes made by me (BlackScout/bscout9956) may be questionable, unreasonable and unnecessary. 
