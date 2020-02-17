@@ -21,7 +21,7 @@ scale = 4
 hr_size = 128
 lr_size = hr_size / scale
 random_lr_scaling = False
-# TODO: Add scaling settings for LR
+lr_scaling = "NEAREST"
 
 # Indexes
 
@@ -42,10 +42,13 @@ def check_file_count(ifolder):
 
 
 def get_filter():
-    if get_random_number(0, 1) == 0:
-        return "NEAREST"
+    if random_lr_scaling:
+        if get_random_number(0, 1) == 0:
+            return "NEAREST"
+        else:
+            return "BICUBIC"
     else:
-        return "BICUBIC"
+        return lr_scaling
 
 
 def process_image(image, filename):
@@ -65,38 +68,16 @@ def process_image(image, filename):
         # LR
         for i in range(v_lr_divs):
             for j in range(h_lr_divs):
-                # print(lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1))
-                try:
-                    image_copy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
-                except OSError:
-                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(
-                        filename))
-                if random_lr_scaling:
-                    image_copy = image_copy.resize((lr_size, lr_size), get_filter())
-                else:
-                    image_copy = image_copy.resize((lr_size, lr_size), 0)
+                image_copy = image.crop((lr_size * j, lr_size * i, lr_size * (j + 1), lr_size * (i + 1)))
+                image_copy = image_copy.resize((lr_size, lr_size), get_filter())
                 image_copy.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
                                 icc_profile=image.info.get('icc_profile'))
         # HR
         for i in range(v_hr_divs):
             for j in range(h_hr_divs):
-                try:
-                    image_copy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
-                except OSError:
-                    print("It is possible that a corrupt or truncated image has been found. Skipping {}".format(
-                        filename))
+                image_copy = image.crop((hr_size * j, hr_size * i, hr_size * (j + 1), hr_size * (i + 1)))
                 image_copy.save(output_dir + slash + filename + "tile_0{}{}".format(i, j) + ".png", "PNG",
                                 icc_profile=image.info.get('icc_profile'))
-
-
-# def process_images(image_path, pic_name):
-# global rgb_index
-# picture = Im.open(image_path, "r")
-# if picture.mode != "RGB":
-# picture = picture.convert(mode="RGB")
-# rgb_index += 1
-# process_lr(picture, pic_name)
-# process_hr(picture, pic_name)
 
 
 def main():
