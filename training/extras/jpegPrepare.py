@@ -30,7 +30,7 @@ def check_file_count(input_folder):
 def process(input_folder):
     file_count = check_file_count(input_folder)
     index = 1
-    rgb_index = 1
+    rgb_index = 0
     failed_index = 0
     for root, dirs, files in os.walk(input_folder):
         for filename in files:
