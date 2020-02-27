@@ -42,7 +42,7 @@ def process(input_folder):
                     if picture.mode != "RGB":
                         picture = picture.convert(mode="RGB")
                         rgb_index += 1
-                    picture.save(pic_path.strip(".png").strip(".jpg").strip(".dds") + ".jpg", "JPEG", quality=get_random_quality(), subsampling=get_random_subsampling())
+                    picture.save(pic_path.rstrip(".png").rstrip(".jpg").rstrip(".dds") + ".jpg", "JPEG", quality=get_random_quality(), subsampling=get_random_subsampling())
                     index += 1
                 except:
                     print("An error prevented this image from being converted")
