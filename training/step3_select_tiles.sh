@@ -2,21 +2,21 @@
 shopt -s extglob
 
 # Examples
-LR_INPUT_DIR="./output/LR"
+LR_INPUT_DIR="./output/lr"
 
 # Ground truth
-HR_INPUT_DIR="./output/HR"
+HR_INPUT_DIR="./output/hr"
 
-MAX_TILE_COUNT=45000
+MAX_TILE_COUNT=45500
 
 TRAINING_PERCENTAGE=99
 VALIDATION_PERCENTAGE=1
 
-TRAINING_HR_OUTPUT_DIR="output_training/HR"
-VALIDATION_HR_OUTPUT_DIR="output_validation/HR"
+TRAINING_HR_OUTPUT_DIR="output_training/hr"
+VALIDATION_HR_OUTPUT_DIR="output_validation/hr"
 
-TRAINING_LR_OUTPUT_DIR="output_training/LR"
-VALIDATION_LR_OUTPUT_DIR="output_validation/LR"
+TRAINING_LR_OUTPUT_DIR="output_training/lr"
+VALIDATION_LR_OUTPUT_DIR="output_validation/lr"
 
 # Extra Options
 
@@ -96,6 +96,7 @@ fi
 mkdir -p "${TRAINING_HR_OUTPUT_DIR}" "${TRAINING_LR_OUTPUT_DIR}" "${VALIDATION_HR_OUTPUT_DIR}" "${VALIDATION_LR_OUTPUT_DIR}"
 
 INDEX=0
+INDEX_VAL=0
 while read FILENAME; do
 
   DIRNAME=$(dirname "${FILENAME}")
@@ -109,23 +110,23 @@ while read FILENAME; do
     if [ "${CLEAN_OUTPUT}" == "0" ]; then
       echo training: ${RELATIVE_DIR}/${BASENAME_NO_EXT}
     else
-      clear
+      #clear
       echo "Processed picture ${INDEX} out of ${TRAINING_COUNT} of the training dataset."
     fi
     cp -a "${HR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${TRAINING_HR_OUTPUT_DIR}/${BASENAME}"
     cp -a "${LR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${TRAINING_LR_OUTPUT_DIR}/${BASENAME}"
+    ((INDEX++))
   else
     if [ "${CLEAN_OUTPUT}" == "0" ]; then
       echo validation: ${RELATIVE_DIR}/${BASENAME_NO_EXT}
     else
-      clear
-      echo "Processed picture ${INDEX} out of ${VALIDATION_COUNT} of the training dataset."
+      #clear
+      echo "Processed picture ${INDEX_VAL} out of ${VALIDATION_COUNT} of the validation dataset."
     fi
     cp -a "${HR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${VALIDATION_HR_OUTPUT_DIR}/${BASENAME}"
     cp -a "${LR_INPUT_DIR}/${RELATIVE_DIR}/${BASENAME}" "${VALIDATION_LR_OUTPUT_DIR}/${BASENAME}"
+    ((INDEX_VAL++))
   fi
-
-  ((INDEX++))
 done < <(find "${HR_INPUT_DIR}" \( -iname "*.jpg" -or -iname "*.dds" -or -iname "*.png" \) | shuf -n ${MAX_TILE_COUNT})
 
 echo "finished"
