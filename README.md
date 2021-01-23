@@ -190,4 +190,4 @@ The included scripts are for preparing your images to be used by ESRGAN, SFTGAN 
  - Some of the changes made by me (BlackScout/bscout9956) may be questionable, unreasonable and unnecessary. 
    - The removal of the thread-limiter code as I faced slightly reduced performance. Even with the maximum amount possible set on my system.
    - The script Step 4 may be easily overriden by the non-training Step 1 but it may not offer the same amount of control.
- - A python alternative exists the scripts written by deorder and modified by me. The alternatives were written from scratch and can be found here: https://github.com/bscout9956/basicsr-dataset-creator
+ - A python alternative exists and is based on the scripts written by deorder and modified by me. The alternatives were written from scratch and can be found here: https://github.com/bscout9956/basicsr-dataset-creator
